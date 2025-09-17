@@ -45,6 +45,12 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.LAZY)
     private List<Product> products = new ArrayList<>();
 
+    // 🔑 Quan hệ với Role
+    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "role_id", referencedColumnName = "id")
+    @JoinColumn(name = "role_id")
+    private Role role;
+
 //    @Column(name = "image")
 //    private String image;
 
