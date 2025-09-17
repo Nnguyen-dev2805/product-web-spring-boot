@@ -161,16 +161,12 @@
             Dashboard
         </a>
 
-<!--        <a class="nav-link" href="/admin/product/list" onclick="showContent('category')" role="menuitem" tabindex="0">-->
-<!--            <i class="bi bi-tags"></i>-->
-<!--            Quản lý danh mục-->
-<!--        </a>-->
         <a class="nav-link" href="#" onclick="loadCategoryContent(event)" role="menuitem" tabindex="0">
             <i class="bi bi-tags"></i>
             Quản lý danh mục
         </a>
 
-        <a class="nav-link" href="#" onclick="showContent('product')" role="menuitem" tabindex="0">
+        <a class="nav-link" href="#" onclick="loadProductContent(event)" role="menuitem" tabindex="0">
             <i class="bi bi-box"></i>
             Quản lý sản phẩm
         </a>
@@ -217,162 +213,40 @@
     <!-- Category Management Content -->
 
     <div id="category-content" class="content-section" style="display: none;">
-        <!-- Bảng danh mục sẽ được render ở đây -->
+        <div id="pagination" class="mt-3"></div>
     </div>
-
-<!--    <div id="category-content" class="content-section">-->
-<!--        <div class="d-flex justify-content-between align-items-center mb-4">-->
-<!--            <h2>Quản lý danh mục</h2>-->
-<!--            <button class="btn btn-success">-->
-<!--                <i class="bi bi-plus"></i> Thêm danh mục-->
-<!--            </button>-->
-<!--        </div>-->
-
-<!--        <div class="card shadow-sm">-->
-<!--            <div class="card-body">-->
-<!--                <div class="table-responsive">-->
-<!--                    <table class="table table-striped">-->
-<!--                        <thead>-->
-<!--                        <tr>-->
-<!--                            <th>ID</th>-->
-<!--                            <th>Tên danh mục</th>-->
-<!--                            <th>Mô tả</th>-->
-<!--                            <th>Thao tác</th>-->
-<!--                        </tr>-->
-<!--                        </thead>-->
-<!--                        <tbody>-->
-<!--                        <tr th:each="category : ${categories}">-->
-<!--                            <td th:text="${category.id}">1</td>-->
-<!--                            <td th:text="${category.name}">Tên danh mục</td>-->
-<!--                            <td th:text="${category.description}">Mô tả</td>-->
-<!--                            <td>-->
-<!--                                <button class="btn btn-sm btn-primary me-1" th:attr="aria-label='Sửa danh mục ' + ${category.name}">-->
-<!--                                    <i class="bi bi-pencil"></i>-->
-<!--                                </button>-->
-<!--                                <button class="btn btn-sm btn-danger" th:attr="aria-label='Xóa danh mục ' + ${category.name}">-->
-<!--                                    <i class="bi bi-trash"></i>-->
-<!--                                </button>-->
-<!--                            </td>-->
-<!--                        </tr>-->
-<!--                        </tbody>-->
-<!--                    </table>-->
-<!--                </div>-->
-<!--            </div>-->
-<!--        </div>-->
-<!--    </div>-->
 
     <!-- Product Management Content -->
     <div id="product-content" class="content-section" style="display: none;">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2>Quản lý sản phẩm</h2>
-            <button class="btn btn-success">
-                <i class="bi bi-plus"></i> Thêm sản phẩm
-            </button>
-        </div>
-
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <div class="row mb-3">
-                    <div class="col-md-4">
-                        <input type="text" class="form-control" placeholder="Tìm kiếm sản phẩm..."/>
-                    </div>
-                    <div class="col-md-3">
-                        <select class="form-select">
-                            <option>Tất cả danh mục</option>
-                            <option>Laptop</option>
-                            <option>Điện thoại</option>
-                        </select>
-                    </div>
-                    <div class="col-md-2">
-                        <button class="btn btn-primary">Tìm kiếm</button>
-                    </div>
-                </div>
-
-                <div class="table-responsive">
-                    <table class="table table-striped">
-                        <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Hình ảnh</th>
-                            <th>Tên sản phẩm</th>
-                            <th>Danh mục</th>
-                            <th>Giá</th>
-                            <th>Trạng thái</th>
-                            <th>Thao tác</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr>
-                            <td>1</td>
-                            <td>
-                                <img src="https://via.placeholder.com/50x50" alt="Product" class="img-thumbnail"
-                                     style="width: 50px; height: 50px;"/>
-                            </td>
-                            <td>iPhone 15 Pro</td>
-                            <td>Điện thoại</td>
-                            <td>25,000,000 ₫</td>
-                            <td><span class="badge bg-success">Còn hàng</span></td>
-                            <td>
-                                <button class="btn btn-sm btn-info me-1" aria-label="Xem iPhone 15 Pro">
-                                    <i class="bi bi-eye"></i>
-                                </button>
-                                <button class="btn btn-sm btn-primary me-1" aria-label="Sửa iPhone 15 Pro">
-                                    <i class="bi bi-pencil"></i>
-                                </button>
-                                <button class="btn btn-sm btn-danger" aria-label="Xóa iPhone 15 Pro">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>2</td>
-                            <td>
-                                <img src="https://via.placeholder.com/50x50" alt="Product" class="img-thumbnail"
-                                     style="width: 50px; height: 50px;"/>
-                            </td>
-                            <td>MacBook Pro M3</td>
-                            <td>Laptop</td>
-                            <td>45,000,000 ₫</td>
-                            <td><span class="badge bg-warning">Sắp hết</span></td>
-                            <td>
-                                <button class="btn btn-sm btn-info me-1" aria-label="Xem MacBook Pro M3">
-                                    <i class="bi bi-eye"></i>
-                                </button>
-                                <button class="btn btn-sm btn-primary me-1" aria-label="Sửa MacBook Pro M3">
-                                    <i class="bi bi-pencil"></i>
-                                </button>
-                                <button class="btn btn-sm btn-danger" aria-label="Xóa MacBook Pro M3">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- Pagination -->
-                <nav>
-                    <ul class="pagination justify-content-center">
-                        <li class="page-item disabled">
-                            <a class="page-link" href="#">Trước</a>
-                        </li>
-                        <li class="page-item active">
-                            <a class="page-link" href="#">1</a>
-                        </li>
-                        <li class="page-item">
-                            <a class="page-link" href="#">2</a>
-                        </li>
-                        <li class="page-item">
-                            <a class="page-link" href="#">3</a>
-                        </li>
-                        <li class="page-item">
-                            <a class="page-link" href="#">Sau</a>
-                        </li>
-                    </ul>
-                </nav>
-            </div>
-        </div>
     </div>
+
+<!--    <div id="product-content" class="content-section" style="display: none;">-->
+<!--        <div class="d-flex justify-content-between align-items-center mb-4">-->
+<!--            <h2>Quản lý sản phẩm</h2>-->
+<!--            <button class="btn btn-success">-->
+<!--                <i class="bi bi-plus"></i> Thêm sản phẩm-->
+<!--            </button>-->
+<!--        </div>-->
+
+<!--        <div class="row mb-3">-->
+<!--            <div class="col-md-4">-->
+<!--                <input type="text" id="searchName" class="form-control" placeholder="Tìm kiếm theo tên sản phẩm"/>-->
+<!--            </div>-->
+<!--            <div class="col-md-4">-->
+<!--                <input type="text" id="searchCategory" class="form-control" placeholder="Tìm kiếm theo danh mục"/>-->
+<!--            </div>-->
+<!--            <div class="col-md-4">-->
+<!--                <button class="btn btn-primary" id="searchBtn">Tìm kiếm</button>-->
+<!--            </div>-->
+<!--        </div>-->
+
+<!--        <div id="productTableContainer"></div>-->
+
+<!--        <nav>-->
+<!--            <ul class="pagination justify-content-center" id="pagination"></ul>-->
+<!--        </nav>-->
+<!--    </div>-->
+
 
     <!-- User Management Content -->
     <div id="user-content" class="content-section" style="display: none;">
@@ -530,27 +404,16 @@
 <!-- Bootstrap JS Bundle -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-<script>
-    // Show thẻ div của từng slide bar
-    // function showContent(section) {
-    //     // Hide all content sections
-    //     const sections = document.querySelectorAll('.content-section');
-    //     sections.forEach(s => s.style.display = 'none');
-    //     // Show selected section
-    //     const target = document.getElementById(section + '-content');
-    //     if (target) {
-    //         target.style.display = 'block';
-    //     }
-    //     // Update active nav link
-    //     const navLinks = document.querySelectorAll('.sidebar .nav-link');
-    //     navLinks.forEach(link => link.classList.remove('active'));
-    //     if (event && event.target) {
-    //         // If click on icon inside <a>, event.target might be <i>, so find closest .nav-link
-    //         const navLink = event.target.closest('.nav-link');
-    //         if (navLink) navLink.classList.add('active');
-    //     }
-    // }
+<script type="module" src="/js/admin/category.js"></script>
 
+<script type="module">
+    import { loadCategoryContent } from '/js/admin/category.js';
+    // gán sự kiện cho menu
+    document.querySelector('.sidebar .nav-link[onclick*="loadCategoryContent"]').addEventListener('click', loadCategoryContent);
+</script>
+
+
+<script>
     function showContent(section) {
         // Hide all content sections
         const sections = document.querySelectorAll('.content-section');
@@ -586,17 +449,9 @@
             }
         }
     });
-
-    // ------------ Khi truy cập vào thì chuyển sang /admin/product/list
-    // document.addEventListener('DOMContentLoaded', function() {
-    //     if (window.location.pathname === '/admin') {
-    //         window.location.href = '/admin/product/list';
-    //     }
-    // });
-
-
 </script>
 
+<!--chỉnh sửa profile-->
 <script>
     // Bật/tắt chế độ chỉnh sửa form profile
     const editBtn = document.getElementById('editProfileBtn');
@@ -699,83 +554,67 @@
 </script>
 
 <script>
-    function loadCategoryContent(event) {
-        event.preventDefault();
-
-        // Ẩn tất cả content sections
-        const sections = document.querySelectorAll('.content-section');
-        sections.forEach(s => s.style.display = 'none');
-
-        // Gọi API lấy danh mục
-        fetch('/admin/categories/list')
-            .then(response => {
-                if (!response.ok) throw new Error('Lỗi khi tải dữ liệu');
-                return response.json();
-            })
-            .then(categories => {
-                let html = `
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h2>Quản lý danh mục</h2>
-                    <button class="btn btn-success">
-                        <i class="bi bi-plus"></i> Thêm danh mục
-                    </button>
-                </div>
-                <div class="card shadow-sm">
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-striped">
-                                <thead>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Tên danh mục</th>
-                                        <th>Mô tả</th>
-                                        <th>Thao tác</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-            `;
-
-                categories.forEach(category => {
-                    html += `
-                    <tr>
-                        <td>${category.id}</td>
-                        <td>${category.name}</td>
-                        <td>${category.description || ''}</td>
-                        <td>
-                            <button class="btn btn-sm btn-primary me-1" aria-label="Sửa danh mục ${category.name}">
-                                <i class="bi bi-pencil"></i>
-                            </button>
-                            <button class="btn btn-sm btn-danger" aria-label="Xóa danh mục ${category.name}">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                        </td>
-                    </tr>
-                `;
-                });
-
-                html += `
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            `;
-
-                const contentDiv = document.getElementById('category-content');
-                contentDiv.innerHTML = html;
-                contentDiv.style.display = 'block';
-
-                // Cập nhật active nav-link
-                const navLinks = document.querySelectorAll('.sidebar .nav-link');
-                navLinks.forEach(link => link.classList.remove('active'));
-                event.target.classList.add('active');
-            })
-            .catch(error => {
-                console.error(error);
-                alert('Không tải được danh mục!');
-            });
+    function loadProductContent(event) {
+        if (event) event.preventDefault();
+        // refreshCategoryList();
     }
 </script>
+
+<!-- Modal Thêm Danh Mục -->
+<div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <form id="addCategoryForm" class="modal-content needs-validation" novalidate>
+            <div class="modal-header">
+                <h5 class="modal-title" id="addCategoryModalLabel">Thêm danh mục mới</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="categoryName" class="form-label">Tên danh mục <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="categoryName" name="name" required maxlength="100" />
+                    <div class="invalid-feedback">Vui lòng nhập tên danh mục</div>
+                </div>
+                <div class="mb-3">
+                    <label for="categoryDescription" class="form-label">Mô tả</label>
+                    <textarea class="form-control" id="categoryDescription" name="description" rows="3" maxlength="255"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="submit" class="btn btn-primary">Thêm danh mục</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal Cập nhật Danh Mục -->
+<div class="modal fade" id="editCategoryModal" tabindex="-1" aria-labelledby="editCategoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <form id="editCategoryForm" class="modal-content needs-validation" novalidate>
+            <div class="modal-header">
+                <h5 class="modal-title" id="editCategoryModalLabel">Cập nhật danh mục</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="editCategoryId" name="id" />
+                <div class="mb-3">
+                    <label for="editCategoryName" class="form-label">Tên danh mục <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="editCategoryName" name="name" required maxlength="100" />
+                    <div class="invalid-feedback">Vui lòng nhập tên danh mục</div>
+                </div>
+                <div class="mb-3">
+                    <label for="editCategoryDescription" class="form-label">Mô tả</label>
+                    <textarea class="form-control" id="editCategoryDescription" name="description" rows="3" maxlength="255"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="submit" class="btn btn-primary">Cập nhật</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 
 
 

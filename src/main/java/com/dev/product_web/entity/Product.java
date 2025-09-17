@@ -15,17 +15,22 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(nullable = false) // tên sản phẩm bắt buộc
+    @Column(nullable = false, length = 255)
     private String name;
-
-    @Column(columnDefinition = "TEXT") // mô tả dài
-    private String description;
 
     @Column(nullable = false)
     private Double price;
 
-    // Quan hệ nhiều sản phẩm thuộc về 1 category
+    @Column(nullable = false)
+    private Integer quantity = 0;
+
+    // quan hệ nhiều product -> 1 user
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id") // khóa ngoại
+    @JoinColumn(name = "userId")
+    private User user;
+
+    // quan hệ nhiều product -> 1 category
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "categoryId")
     private Category category;
 }

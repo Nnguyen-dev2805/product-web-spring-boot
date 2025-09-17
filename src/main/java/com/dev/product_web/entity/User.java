@@ -6,7 +6,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -38,6 +40,10 @@ public class User {
     @Lob
     @Column(name = "image")
     private byte[] imageData;
+
+    // 1 user có thể có nhiều products
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.LAZY)
+    private List<Product> products = new ArrayList<>();
 
 //    @Column(name = "image")
 //    private String image;
