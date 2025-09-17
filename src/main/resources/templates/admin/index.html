@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>Admin Dashboard</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet"/>
+    <style>
+        /* Sidebar */
+        .sidebar {
+            background: linear-gradient(180deg, #004085, #007bff);
+            min-height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 250px;
+            z-index: 1000;
+            transition: all 0.3s;
+            padding-top: 20px;
+            display: flex;
+            flex-direction: column;
+            color: #e9f0fb;
+            box-shadow: 2px 0 8px rgb(0 0 0 / 0.15);
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: #e9f0fb;
+            border-bottom: 1px solid rgba(255 255 255 / 0.15);
+            user-select: none;
+        }
+
+        .account-info {
+            font-size: 0.9rem;
+            border-bottom: 1px solid rgba(255 255 255 / 0.15);
+            padding: 15px 20px;
+            color: #d0d9f7;
+            user-select: none;
+        }
+
+        .account-info strong {
+            color: #fff;
+        }
+
+        .sidebar .nav {
+            flex-grow: 1;
+            padding-top: 15px;
+        }
+
+        .sidebar .nav-link {
+            color: #d0d9f7;
+            padding: 12px 20px;
+            border-radius: 0;
+            transition: background-color 0.3s, color 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .sidebar .nav-link:hover {
+            background-color: rgba(0, 123, 255, 0.7);
+            color: #fff;
+            text-decoration: none;
+        }
+
+        .sidebar .nav-link.active {
+            background-color: #003366;
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .sidebar .nav-link i {
+            font-size: 1.2rem;
+            color: inherit;
+        }
+
+        hr.text-white {
+            border-color: rgba(255 255 255 / 0.3);
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+            padding-top: 20px;
+            transition: all 0.3s;
+        }
+
+        /* Toggle button for mobile */
+        .toggle-sidebar-btn {
+            display: none;
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                margin-left: -250px;
+                padding-top: 20px;
+            }
+
+            .sidebar.show {
+                margin-left: 0;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding-top: 20px;
+            }
+
+            .toggle-sidebar-btn {
+                display: inline-block;
+            }
+        }
+
+        /* Stats Cards */
+        .stats-card {
+            border-left: 4px solid;
+            transition: transform 0.2s;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .stats-card.primary {
+            border-left-color: #007bff;
+        }
+
+        .stats-card.success {
+            border-left-color: #28a745;
+        }
+
+        .stats-card.warning {
+            border-left-color: #ffc107;
+        }
+
+        .stats-card.info {
+            border-left-color: #17a2b8;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<nav class="sidebar" aria-label="Sidebar navigation">
+    <div class="sidebar-header">
+        <i class="bi bi-gear-fill"></i> Admin Panel
+    </div>
+
+    <div class="nav flex-column" role="menu">
+        <a class="nav-link active" href="#" onclick="showContent('dashboard')" role="menuitem" tabindex="0">
+            <i class="bi bi-speedometer2"></i>
+            Dashboard
+        </a>
+
+<!--        <a class="nav-link" href="/admin/product/list" onclick="showContent('category')" role="menuitem" tabindex="0">-->
+<!--            <i class="bi bi-tags"></i>-->
+<!--            Quản lý danh mục-->
+<!--        </a>-->
+        <a class="nav-link" href="#" onclick="loadCategoryContent(event)" role="menuitem" tabindex="0">
+            <i class="bi bi-tags"></i>
+            Quản lý danh mục
+        </a>
+
+        <a class="nav-link" href="#" onclick="showContent('product')" role="menuitem" tabindex="0">
+            <i class="bi bi-box"></i>
+            Quản lý sản phẩm
+        </a>
+        <a class="nav-link" href="#" onclick="showContent('user')" role="menuitem" tabindex="0">
+            <i class="bi bi-people"></i>
+            Quản lý người dùng
+        </a>
+        <a class="nav-link" href="#" onclick="showContent('account-info')" role="menuitem" tabindex="0">
+            <i class="bi bi-person-circle"></i>
+            Thông tin tài khoản
+        </a>
+        <hr class="text-white my-3"/>
+        <a class="nav-link" href="#" role="menuitem" tabindex="0">
+            <i class="bi bi-box-arrow-right"></i>
+            Đăng xuất
+        </a>
+    </div>
+</nav>
+
+<!-- Main Content -->
+<div class="main-content" role="main">
+    <button class="btn btn-primary d-md-none toggle-sidebar-btn" onclick="toggleSidebar()" aria-label="Toggle sidebar">
+        <i class="bi bi-list"></i>
+    </button>
+
+    <!-- Dashboard Content -->
+    <div id="dashboard-content" class="content-section" style="display: block;">
+        <!-- Welcome Card -->
+        <div class="card welcome-card mb-4">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h2 class="mb-1">Chào mừng trở lại, Admin!</h2>
+                        <p class="mb-0">Dưới đây là tổng quan về hệ thống của bạn hôm nay.</p>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <i class="bi bi-person-check-fill" style="font-size: 3rem; opacity: 0.7;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Category Management Content -->
+
+    <div id="category-content" class="content-section" style="display: none;">
+        <!-- Bảng danh mục sẽ được render ở đây -->
+    </div>
+
+<!--    <div id="category-content" class="content-section">-->
+<!--        <div class="d-flex justify-content-between align-items-center mb-4">-->
+<!--            <h2>Quản lý danh mục</h2>-->
+<!--            <button class="btn btn-success">-->
+<!--                <i class="bi bi-plus"></i> Thêm danh mục-->
+<!--            </button>-->
+<!--        </div>-->
+
+<!--        <div class="card shadow-sm">-->
+<!--            <div class="card-body">-->
+<!--                <div class="table-responsive">-->
+<!--                    <table class="table table-striped">-->
+<!--                        <thead>-->
+<!--                        <tr>-->
+<!--                            <th>ID</th>-->
+<!--                            <th>Tên danh mục</th>-->
+<!--                            <th>Mô tả</th>-->
+<!--                            <th>Thao tác</th>-->
+<!--                        </tr>-->
+<!--                        </thead>-->
+<!--                        <tbody>-->
+<!--                        <tr th:each="category : ${categories}">-->
+<!--                            <td th:text="${category.id}">1</td>-->
+<!--                            <td th:text="${category.name}">Tên danh mục</td>-->
+<!--                            <td th:text="${category.description}">Mô tả</td>-->
+<!--                            <td>-->
+<!--                                <button class="btn btn-sm btn-primary me-1" th:attr="aria-label='Sửa danh mục ' + ${category.name}">-->
+<!--                                    <i class="bi bi-pencil"></i>-->
+<!--                                </button>-->
+<!--                                <button class="btn btn-sm btn-danger" th:attr="aria-label='Xóa danh mục ' + ${category.name}">-->
+<!--                                    <i class="bi bi-trash"></i>-->
+<!--                                </button>-->
+<!--                            </td>-->
+<!--                        </tr>-->
+<!--                        </tbody>-->
+<!--                    </table>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
+
+    <!-- Product Management Content -->
+    <div id="product-content" class="content-section" style="display: none;">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Quản lý sản phẩm</h2>
+            <button class="btn btn-success">
+                <i class="bi bi-plus"></i> Thêm sản phẩm
+            </button>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <input type="text" class="form-control" placeholder="Tìm kiếm sản phẩm..."/>
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-select">
+                            <option>Tất cả danh mục</option>
+                            <option>Laptop</option>
+                            <option>Điện thoại</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-primary">Tìm kiếm</button>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Hình ảnh</th>
+                            <th>Tên sản phẩm</th>
+                            <th>Danh mục</th>
+                            <th>Giá</th>
+                            <th>Trạng thái</th>
+                            <th>Thao tác</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>
+                                <img src="https://via.placeholder.com/50x50" alt="Product" class="img-thumbnail"
+                                     style="width: 50px; height: 50px;"/>
+                            </td>
+                            <td>iPhone 15 Pro</td>
+                            <td>Điện thoại</td>
+                            <td>25,000,000 ₫</td>
+                            <td><span class="badge bg-success">Còn hàng</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-info me-1" aria-label="Xem iPhone 15 Pro">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                                <button class="btn btn-sm btn-primary me-1" aria-label="Sửa iPhone 15 Pro">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="btn btn-sm btn-danger" aria-label="Xóa iPhone 15 Pro">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>
+                                <img src="https://via.placeholder.com/50x50" alt="Product" class="img-thumbnail"
+                                     style="width: 50px; height: 50px;"/>
+                            </td>
+                            <td>MacBook Pro M3</td>
+                            <td>Laptop</td>
+                            <td>45,000,000 ₫</td>
+                            <td><span class="badge bg-warning">Sắp hết</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-info me-1" aria-label="Xem MacBook Pro M3">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                                <button class="btn btn-sm btn-primary me-1" aria-label="Sửa MacBook Pro M3">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="btn btn-sm btn-danger" aria-label="Xóa MacBook Pro M3">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <nav>
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#">Trước</a>
+                        </li>
+                        <li class="page-item active">
+                            <a class="page-link" href="#">1</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="#">2</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="#">3</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="#">Sau</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Management Content -->
+    <div id="user-content" class="content-section" style="display: none;">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Quản lý người dùng</h2>
+            <button class="btn btn-success">
+                <i class="bi bi-plus"></i> Thêm người dùng
+            </button>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Avatar</th>
+                            <th>Tên người dùng</th>
+                            <th>Email</th>
+                            <th>Vai trò</th>
+                            <th>Trạng thái</th>
+                            <th>Ngày tạo</th>
+                            <th>Thao tác</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>
+                                <img src="https://via.placeholder.com/40x40" alt="Avatar" class="rounded-circle"
+                                     style="width: 40px; height: 40px;"/>
+                            </td>
+                            <td>Nguyễn Văn A</td>
+                            <td>admin@example.com</td>
+                            <td><span class="badge bg-danger">Admin</span></td>
+                            <td><span class="badge bg-success">Hoạt động</span></td>
+                            <td>01/01/2024</td>
+                            <td>
+                                <button class="btn btn-sm btn-info me-1" aria-label="Xem Nguyễn Văn A">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                                <button class="btn btn-sm btn-primary me-1" aria-label="Sửa Nguyễn Văn A">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="btn btn-sm btn-warning" aria-label="Khóa Nguyễn Văn A">
+                                    <i class="bi bi-lock"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>
+                                <img src="https://via.placeholder.com/40x40" alt="Avatar" class="rounded-circle"
+                                     style="width: 40px; height: 40px;"/>
+                            </td>
+                            <td>Trần Thị B</td>
+                            <td>user@example.com</td>
+                            <td><span class="badge bg-primary">User   </span></td>
+                            <td><span class="badge bg-success">Hoạt động</span></td>
+                            <td>15/01/2024</td>
+                            <td>
+                                <button class="btn btn-sm btn-info me-1" aria-label="Xem Trần Thị B">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                                <button class="btn btn-sm btn-primary me-1" aria-label="Sửa Trần Thị B">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="btn btn-sm btn-warning" aria-label="Khóa Trần Thị B">
+                                    <i class="bi bi-lock"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Account Information Content -->
+    <div id="account-info-content" class="content-section" style="display: none;">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Thông tin tài khoản</h2>
+            <button class="btn btn-success" id="editProfileBtn">
+                <i class="bi bi-pencil"></i> Chỉnh sửa thông tin
+            </button>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data" id="profileForm" novalidate>
+                    <!-- Avatar -->
+                    <div class="text-center mb-4">
+                        <div class="position-relative d-inline-block">
+                            <img src="https://via.placeholder.com/120" id="avatarPreview"
+                                 class="rounded-circle border border-3 border-primary"
+                                 alt="Avatar" />
+                        </div>
+                        <h5 class="mt-2 mb-1" id="fullnameDisplay">Nguyễn Văn A</h5>
+                        <small class="text-muted" id="usernameDisplay">@admin</small>
+                    </div>
+
+                    <!-- Upload ảnh đại diện -->
+                    <div class="mb-3">
+                        <label for="image" class="form-label"><i class="bi bi-camera"></i> Ảnh đại diện</label>
+                        <input type="file" class="form-control" id="image" name="image" accept="image/*" onchange="previewImage(this)" disabled />
+                        <div class="form-text">Chỉ chấp nhận file ảnh (JPG, JPEG, PNG, GIF), tối đa 5MB</div>
+                    </div>
+
+                    <!-- Username (readonly) -->
+                    <div class="mb-3">
+                        <label for="username" class="form-label"><i class="bi bi-person"></i> Tên đăng nhập</label>
+                        <input type="text" class="form-control" id="username" name="username" value="admin" readonly />
+                        <div class="form-text text-muted">Tên đăng nhập không thể thay đổi</div>
+                    </div>
+
+                    <!-- Email -->
+                    <div class="mb-3">
+                        <label for="email" class="form-label"><i class="bi bi-envelope"></i> Email <span class="text-danger">*</span></label>
+                        <input type="email" class="form-control" id="email" name="email" value="admin@example.com" required maxlength="100" disabled />
+                        <div class="invalid-feedback">Vui lòng nhập email hợp lệ</div>
+                    </div>
+
+                    <!-- Fullname -->
+                    <div class="mb-3">
+                        <label for="fullname" class="form-label"><i class="bi bi-person-badge"></i> Họ và tên <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="fullname" name="fullname" value="Nguyễn Văn A" required maxlength="100" disabled />
+                        <div class="invalid-feedback">Vui lòng nhập họ và tên</div>
+                    </div>
+
+                    <!-- Phone -->
+                    <div class="mb-4">
+                        <label for="phone" class="form-label"><i class="bi bi-telephone"></i> Số điện thoại</label>
+                        <input type="tel" class="form-control" id="phone" name="phone" value="0123456789" maxlength="20" pattern="0[0-9]{9,10}" title="Số điện thoại phải bắt đầu bằng 0 và có 10-11 chữ số" disabled />
+                        <div class="form-text">Định dạng: 0xxxxxxxxx (10-11 số)</div>
+                    </div>
+
+                    <!-- Buttons -->
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <button type="button" class="btn btn-outline-secondary me-md-2" id="cancelEditBtn" style="display:none;">
+                            <i class="bi bi-x-lg"></i> Hủy
+                        </button>
+                        <button type="submit" class="btn btn-primary" id="submitBtn" style="display:none;">
+                            <i class="bi bi-check-lg"></i> Cập nhật thông tin
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Bootstrap JS Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // Show thẻ div của từng slide bar
+    // function showContent(section) {
+    //     // Hide all content sections
+    //     const sections = document.querySelectorAll('.content-section');
+    //     sections.forEach(s => s.style.display = 'none');
+    //     // Show selected section
+    //     const target = document.getElementById(section + '-content');
+    //     if (target) {
+    //         target.style.display = 'block';
+    //     }
+    //     // Update active nav link
+    //     const navLinks = document.querySelectorAll('.sidebar .nav-link');
+    //     navLinks.forEach(link => link.classList.remove('active'));
+    //     if (event && event.target) {
+    //         // If click on icon inside <a>, event.target might be <i>, so find closest .nav-link
+    //         const navLink = event.target.closest('.nav-link');
+    //         if (navLink) navLink.classList.add('active');
+    //     }
+    // }
+
+    function showContent(section) {
+        // Hide all content sections
+        const sections = document.querySelectorAll('.content-section');
+        sections.forEach(s => s.style.display = 'none');
+        // Show selected section
+        const target = document.getElementById(section + '-content');
+        if (target) {
+            target.style.display = 'block';
+        }
+        // Update active nav link
+        const navLinks = document.querySelectorAll('.sidebar .nav-link');
+        navLinks.forEach(link => link.classList.remove('active'));
+        if (event && event.target) {
+            const navLink = event.target.closest('.nav-link');
+            if (navLink) navLink.classList.add('active');
+        }
+    }
+
+
+    // Function to toggle sidebar on mobile
+    function toggleSidebar() {
+        const sidebar = document.querySelector('.sidebar');
+        sidebar.classList.toggle('show');
+    }
+
+    // Close sidebar when clicking outside on mobile
+    document.addEventListener('click', function (event) {
+        const sidebar = document.querySelector('.sidebar');
+        const toggleBtn = document.querySelector('.toggle-sidebar-btn');
+        if (window.innerWidth <= 768) {
+            if (!sidebar.contains(event.target) && !toggleBtn.contains(event.target)) {
+                sidebar.classList.remove('show');
+            }
+        }
+    });
+
+    // ------------ Khi truy cập vào thì chuyển sang /admin/product/list
+    // document.addEventListener('DOMContentLoaded', function() {
+    //     if (window.location.pathname === '/admin') {
+    //         window.location.href = '/admin/product/list';
+    //     }
+    // });
+
+
+</script>
+
+<script>
+    // Bật/tắt chế độ chỉnh sửa form profile
+    const editBtn = document.getElementById('editProfileBtn');
+    const cancelBtn = document.getElementById('cancelEditBtn');
+    const submitBtn = document.getElementById('submitBtn');
+    const profileForm = document.getElementById('profileForm');
+
+    editBtn.addEventListener('click', () => {
+        toggleEdit(true);
+    });
+
+    cancelBtn.addEventListener('click', () => {
+        toggleEdit(false);
+        profileForm.reset();
+        // Reset avatar preview nếu cần (nếu bạn có logic load avatar thực tế)
+    });
+
+    function toggleEdit(isEdit) {
+        // Bật/tắt disabled cho các input ngoại trừ username
+        ['image', 'email', 'fullname', 'phone'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.disabled = !isEdit;
+        });
+
+        // Hiện/ẩn nút submit và cancel
+        submitBtn.style.display = isEdit ? 'inline-block' : 'none';
+        cancelBtn.style.display = isEdit ? 'inline-block' : 'none';
+
+        // Ẩn/hiện nút edit
+        editBtn.style.display = isEdit ? 'none' : 'inline-block';
+    }
+
+    // Hàm preview ảnh đại diện
+    function previewImage(input) {
+        if (input.files && input.files[0]) {
+            const file = input.files[0];
+
+            if (file.size > 5 * 1024 * 1024) {
+                alert('Kích thước file không được vượt quá 5MB!');
+                input.value = '';
+                return;
+            }
+
+            const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+            if (!allowedTypes.includes(file.type)) {
+                alert('Chỉ chấp nhận file ảnh định dạng JPG, JPEG, PNG, GIF!');
+                input.value = '';
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const preview = document.getElementById('avatarPreview');
+                preview.src = e.target.result;
+                // Thêm các style để ảnh vừa khung tròn
+                preview.style.width = '120px';
+                preview.style.height = '120px';
+                preview.style.objectFit = 'cover';
+                preview.style.borderRadius = '50%';
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    // Validation form khi submit
+    profileForm.addEventListener('submit', function(e) {
+        const email = document.getElementById('email').value.trim();
+        const fullname = document.getElementById('fullname').value.trim();
+        const phone = document.getElementById('phone').value.trim();
+
+        let isValid = true;
+        let errorMessage = '';
+
+        if (!email) {
+            errorMessage = 'Email không được để trống!';
+            isValid = false;
+        } else if (!/^[A-Za-z0-9+_.-]+@([A-Za-z0-9.-]+\.[A-Za-z]{2,})$/.test(email)) {
+            errorMessage = 'Email không hợp lệ!';
+            isValid = false;
+        }
+
+        if (!fullname) {
+            errorMessage = 'Họ và tên không được để trống!';
+            isValid = false;
+        }
+
+        if (phone && !/^0[0-9]{9,10}$/.test(phone)) {
+            errorMessage = 'Số điện thoại không hợp lệ! Phải bắt đầu bằng 0 và có 10-11 chữ số.';
+            isValid = false;
+        }
+
+        if (!isValid) {
+            e.preventDefault();
+            alert(errorMessage);
+        } else {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Đang xử lý...';
+        }
+    });
+</script>
+
+<script>
+    function loadCategoryContent(event) {
+        event.preventDefault();
+
+        // Ẩn tất cả content sections
+        const sections = document.querySelectorAll('.content-section');
+        sections.forEach(s => s.style.display = 'none');
+
+        // Gọi API lấy danh mục
+        fetch('/admin/categories/list')
+            .then(response => {
+                if (!response.ok) throw new Error('Lỗi khi tải dữ liệu');
+                return response.json();
+            })
+            .then(categories => {
+                let html = `
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2>Quản lý danh mục</h2>
+                    <button class="btn btn-success">
+                        <i class="bi bi-plus"></i> Thêm danh mục
+                    </button>
+                </div>
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Tên danh mục</th>
+                                        <th>Mô tả</th>
+                                        <th>Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+            `;
+
+                categories.forEach(category => {
+                    html += `
+                    <tr>
+                        <td>${category.id}</td>
+                        <td>${category.name}</td>
+                        <td>${category.description || ''}</td>
+                        <td>
+                            <button class="btn btn-sm btn-primary me-1" aria-label="Sửa danh mục ${category.name}">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger" aria-label="Xóa danh mục ${category.name}">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+                });
+
+                html += `
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+                const contentDiv = document.getElementById('category-content');
+                contentDiv.innerHTML = html;
+                contentDiv.style.display = 'block';
+
+                // Cập nhật active nav-link
+                const navLinks = document.querySelectorAll('.sidebar .nav-link');
+                navLinks.forEach(link => link.classList.remove('active'));
+                event.target.classList.add('active');
+            })
+            .catch(error => {
+                console.error(error);
+                alert('Không tải được danh mục!');
+            });
+    }
+</script>
+
+
+
+</body>
+</html>
