@@ -1,5 +1,6 @@
 package com.dev.product_web.service.impl;
 
+import com.dev.product_web.dto.category.CategoryResponse;
 import com.dev.product_web.dto.product.ProductResponse;
 import com.dev.product_web.dto.role.RoleResponse;
 import com.dev.product_web.dto.user.UserRequest;
@@ -83,5 +84,13 @@ public class UserServiceImpl implements UserService {
             throw new NoSuchElementException("Người dùng không tồn tại");
         }
         userRepository.deleteById(id);
+    }
+
+    @Override
+    public List<UserResponse> getAllUsers() {
+        return userRepository.findAll()
+                .stream()
+                .map(c -> modelMapper.map(c, UserResponse.class))
+                .collect(Collectors.toList());
     }
 }

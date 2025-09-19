@@ -14,6 +14,8 @@ public class ProductResponse {
     private String name;
     private Double price;
     private Integer quantity;
+    private Integer userId;
     private String userFullName;
+    private Integer categoryId;
     private String categoryName;
 }

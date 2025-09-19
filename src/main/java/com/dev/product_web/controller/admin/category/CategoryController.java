@@ -18,7 +18,7 @@ public class CategoryController {
 
     private final CategoryService categoryService;
 
-    @GetMapping("/list")
+    @GetMapping({"", "/list"})
     public List<CategoryResponse> getCategories() {
         return categoryService.getAllCategories();
     }

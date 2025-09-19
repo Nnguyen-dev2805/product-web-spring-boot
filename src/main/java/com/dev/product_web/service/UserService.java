@@ -14,4 +14,5 @@ public interface UserService {
     User createUser (UserRequest request);
     UserResponse saveUser(UserRequest request);
     void deleteUser(Integer id);
+    List<UserResponse> getAllUsers();
 }

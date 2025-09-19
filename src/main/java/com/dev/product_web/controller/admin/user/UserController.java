@@ -1,6 +1,5 @@
 package com.dev.product_web.controller.admin.user;
 
-import com.dev.product_web.dto.role.RoleResponse;
 import com.dev.product_web.dto.user.UserRequest;
 import com.dev.product_web.dto.user.UserResponse;
 import com.dev.product_web.entity.User;
@@ -15,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/admin/users")
@@ -23,6 +21,11 @@ import java.util.stream.Collectors;
 public class UserController {
 
     private final UserService userService;
+
+    @GetMapping("")
+    public List<UserResponse> getAllUsers() {
+        return userService.getAllUsers();
+    }
 
     @GetMapping("/list")
     public ResponseEntity<List<UserResponse>> getAllUsersExceptCurrent(HttpSession session) {
