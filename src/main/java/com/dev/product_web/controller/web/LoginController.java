@@ -18,7 +18,7 @@ public class LoginController {
     private final UserService userService;
 
     @GetMapping("/login")
-    public String showLoginPage(HttpServletRequest req, Model model) {
+    public String showLoginPage() {
         return "web/login";
     }
 

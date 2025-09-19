@@ -1,10 +1,9 @@
-package com.dev.product_web.controller.product;
+package com.dev.product_web.controller.admin.category;
 
 import com.dev.product_web.dto.category.CategoryResponse;
 import com.dev.product_web.entity.Category;
 import com.dev.product_web.service.CategoryService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

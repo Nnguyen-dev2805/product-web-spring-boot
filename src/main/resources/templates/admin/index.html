@@ -149,6 +149,9 @@
 </head>
 <body>
 
+<!-- Input ẩn chứa currentUser Id -->
+<input type="hidden" id="currentUser_Id" value="[[${currentUser_Id}]]" />
+
 <!-- Sidebar -->
 <nav class="sidebar" aria-label="Sidebar navigation">
     <div class="sidebar-header">
@@ -170,16 +173,29 @@
             <i class="bi bi-box"></i>
             Quản lý sản phẩm
         </a>
-        <a class="nav-link" href="#" onclick="showContent('user')" role="menuitem" tabindex="0">
+        <a class="nav-link" href="#" onclick="loadUserContent(event)" role="menuitem" tabindex="0">
             <i class="bi bi-people"></i>
             Quản lý người dùng
         </a>
+
+<!--        <a class="nav-link" href="#" role="menuitem" tabindex="0" data-action="loadCategoryContent">-->
+<!--            <i class="bi bi-tags"></i>-->
+<!--            Quản lý danh mục-->
+<!--        </a>-->
+<!--        <a class="nav-link" href="#" role="menuitem" tabindex="0" data-action="loadProductContent">-->
+<!--            <i class="bi bi-box"></i>-->
+<!--            Quản lý sản phẩm-->
+<!--        </a>-->
+<!--        <a class="nav-link" href="#" role="menuitem" tabindex="0" data-action="loadUserContent">-->
+<!--            <i class="bi bi-people"></i>-->
+<!--            Quản lý người dùng-->
+<!--        </a>-->
         <a class="nav-link" href="#" onclick="showContent('account-info')" role="menuitem" tabindex="0">
             <i class="bi bi-person-circle"></i>
             Thông tin tài khoản
         </a>
         <hr class="text-white my-3"/>
-        <a class="nav-link" href="#" role="menuitem" tabindex="0">
+        <a class="nav-link" href="/logout" role="menuitem" tabindex="0">
             <i class="bi bi-box-arrow-right"></i>
             Đăng xuất
         </a>
@@ -488,81 +504,6 @@
 
     <!-- User Management Content -->
     <div id="user-content" class="content-section" style="display: none;">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2>Quản lý người dùng</h2>
-            <button class="btn btn-success">
-                <i class="bi bi-plus"></i> Thêm người dùng
-            </button>
-        </div>
-
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-striped">
-                        <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Avatar</th>
-                            <th>Tên người dùng</th>
-                            <th>Email</th>
-                            <th>Vai trò</th>
-                            <th>Trạng thái</th>
-                            <th>Ngày tạo</th>
-                            <th>Thao tác</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr>
-                            <td>1</td>
-                            <td>
-                                <img src="https://via.placeholder.com/40x40" alt="Avatar" class="rounded-circle"
-                                     style="width: 40px; height: 40px;"/>
-                            </td>
-                            <td>Nguyễn Văn A</td>
-                            <td>admin@example.com</td>
-                            <td><span class="badge bg-danger">Admin</span></td>
-                            <td><span class="badge bg-success">Hoạt động</span></td>
-                            <td>01/01/2024</td>
-                            <td>
-                                <button class="btn btn-sm btn-info me-1" aria-label="Xem Nguyễn Văn A">
-                                    <i class="bi bi-eye"></i>
-                                </button>
-                                <button class="btn btn-sm btn-primary me-1" aria-label="Sửa Nguyễn Văn A">
-                                    <i class="bi bi-pencil"></i>
-                                </button>
-                                <button class="btn btn-sm btn-warning" aria-label="Khóa Nguyễn Văn A">
-                                    <i class="bi bi-lock"></i>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>2</td>
-                            <td>
-                                <img src="https://via.placeholder.com/40x40" alt="Avatar" class="rounded-circle"
-                                     style="width: 40px; height: 40px;"/>
-                            </td>
-                            <td>Trần Thị B</td>
-                            <td>user@example.com</td>
-                            <td><span class="badge bg-primary">User   </span></td>
-                            <td><span class="badge bg-success">Hoạt động</span></td>
-                            <td>15/01/2024</td>
-                            <td>
-                                <button class="btn btn-sm btn-info me-1" aria-label="Xem Trần Thị B">
-                                    <i class="bi bi-eye"></i>
-                                </button>
-                                <button class="btn btn-sm btn-primary me-1" aria-label="Sửa Trần Thị B">
-                                    <i class="bi bi-pencil"></i>
-                                </button>
-                                <button class="btn btn-sm btn-warning" aria-label="Khóa Trần Thị B">
-                                    <i class="bi bi-lock"></i>
-                                </button>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
     </div>
 
     <!-- Account Information Content -->
@@ -639,20 +580,25 @@
 
 </div>
 
+
 <!-- Bootstrap JS Bundle -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script type="module" src="/js/admin/category.js"></script>
 <script type="module" src="/js/admin/product.js"></script>
+<script type="module" src="/js/admin/user.js"></script>
 
 <script type="module">
     import { loadCategoryContent } from '/js/admin/category.js';
     import { loadProductContent } from '/js/admin/product.js';
+    import { loadUserContent } from '/js/admin/user.js';
 
-    // gán sự kiện cho menu
+    // // gán sự kiện cho menu
     document.querySelector('.sidebar .nav-link[onclick*="loadCategoryContent"]').addEventListener('click', loadCategoryContent);
 
     document.querySelector('.sidebar .nav-link[onclick*="loadProductContent"]').addEventListener('click', loadProductContent);
+
+    document.querySelector('.sidebar .nav-link[onclick*="loadUserContent"]').addEventListener('click', loadUserContent);
 </script>
 
 
@@ -940,6 +886,107 @@
         </form>
     </div>
 </div>
+
+
+<!-- Modal Thêm Người Dùng -->
+<div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <form id="addUserForm" class="modal-content needs-validation" novalidate>
+            <div class="modal-header">
+                <h5 class="modal-title" id="addUserModalLabel">Thêm người dùng mới</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="addUserFullname" class="form-label">Họ và tên <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="addUserFullname" name="fullname" required maxlength="100" />
+                    <div class="invalid-feedback">Vui lòng nhập họ và tên</div>
+                </div>
+                <!-- Trường Username mới -->
+                <div class="mb-3">
+                    <label for="addUserUsername" class="form-label">Tên đăng nhập <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="addUserUsername" name="username" required maxlength="50" />
+                    <div class="invalid-feedback">Vui lòng nhập tên đăng nhập</div>
+                </div>
+                <div class="mb-3">
+                    <label for="addUserEmail" class="form-label">Email <span class="text-danger">*</span></label>
+                    <input type="email" class="form-control" id="addUserEmail" name="email" required maxlength="100" />
+                    <div class="invalid-feedback">Vui lòng nhập email hợp lệ</div>
+                </div>
+                <div class="mb-3">
+                    <label for="addUserPhone" class="form-label">Số điện thoại</label>
+                    <input type="tel" class="form-control" id="addUserPhone" name="phone" maxlength="20" pattern="0[0-9]{9,10}" title="Số điện thoại phải bắt đầu bằng 0 và có 10-11 chữ số" />
+                    <div class="form-text">Định dạng: 0xxxxxxxxx (10-11 số)</div>
+                </div>
+                <div class="mb-3">
+                    <label for="addUserRole" class="form-label">Vai trò <span class="text-danger">*</span></label>
+                    <select class="form-select" id="addUserRole" name="roleId" required>
+                        <!-- Các option vai trò sẽ được load động -->
+                    </select>
+                    <div class="invalid-feedback">Vui lòng chọn vai trò</div>
+                </div>
+                <div class="mb-3">
+                    <label for="addUserPassword" class="form-label">Mật khẩu <span class="text-danger">*</span></label>
+                    <input type="password" class="form-control" id="addUserPassword" name="password" required minlength="6" />
+                    <div class="invalid-feedback">Vui lòng nhập mật khẩu (tối thiểu 6 ký tự)</div>
+                </div>
+                <div class="mb-3">
+                    <label for="addUserConfirmPassword" class="form-label">Xác nhận mật khẩu <span class="text-danger">*</span></label>
+                    <input type="password" class="form-control" id="addUserConfirmPassword" name="confirmPassword" required minlength="6" />
+                    <div class="invalid-feedback">Mật khẩu xác nhận không khớp</div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="submit" class="btn btn-primary">Thêm người dùng</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<!-- Modal Cập nhật Người Dùng -->
+<div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <form id="editUserForm" class="modal-content needs-validation" novalidate>
+            <div class="modal-header">
+                <h5 class="modal-title" id="editUserModalLabel">Cập nhật người dùng</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="editUserId" name="id" />
+                <div class="mb-3">
+                    <label for="editUserFullname" class="form-label">Họ và tên <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="editUserFullname" name="fullname" required maxlength="100" />
+                    <div class="invalid-feedback">Vui lòng nhập họ và tên</div>
+                </div>
+                <div class="mb-3">
+                    <label for="editUserEmail" class="form-label">Email <span class="text-danger">*</span></label>
+                    <input type="email" class="form-control" id="editUserEmail" name="email" required maxlength="100" />
+                    <div class="invalid-feedback">Vui lòng nhập email hợp lệ</div>
+                </div>
+                <div class="mb-3">
+                    <label for="editUserPhone" class="form-label">Số điện thoại</label>
+                    <input type="tel" class="form-control" id="editUserPhone" name="phone" maxlength="20" pattern="0[0-9]{9,10}" title="Số điện thoại phải bắt đầu bằng 0 và có 10-11 chữ số" />
+                    <div class="form-text">Định dạng: 0xxxxxxxxx (10-11 số)</div>
+                </div>
+                <div class="mb-3">
+                    <label for="editUserRole" class="form-label">Vai trò <span class="text-danger">*</span></label>
+                    <select class="form-select" id="editUserRole" name="roleId" required>
+                        <!-- Các option vai trò sẽ được load động -->
+                    </select>
+                    <div class="invalid-feedback">Vui lòng chọn vai trò</div>
+                </div>
+                <!-- Nếu muốn cho phép đổi mật khẩu khi cập nhật, có thể thêm các trường mật khẩu ở đây -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="submit" class="btn btn-primary">Cập nhật người dùng</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 
 
 <!-- Chart.js CDN -->

@@ -1,5 +1,6 @@
 package com.dev.product_web.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -23,5 +24,6 @@ public class Role {
 
     // 1 role có thể gán cho nhiều user
     @OneToMany(mappedBy = "role", fetch = FetchType.LAZY)
+    @JsonIgnoreProperties("role") // bỏ qua trường role trong User khi serialize Role
     private List<User> users = new ArrayList<>();
 }

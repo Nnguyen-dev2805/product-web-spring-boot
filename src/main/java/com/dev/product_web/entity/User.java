@@ -1,5 +1,6 @@
 package com.dev.product_web.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -49,6 +50,7 @@ public class User {
     @ManyToOne(fetch = FetchType.LAZY)
 //    @JoinColumn(name = "role_id", referencedColumnName = "id")
     @JoinColumn(name = "role_id")
+    @JsonIgnoreProperties("users") // bỏ qua trường users trong Role khi serialize User
     private Role role;
 
 //    @Column(name = "image")

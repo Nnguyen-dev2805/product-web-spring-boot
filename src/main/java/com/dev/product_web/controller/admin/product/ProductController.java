@@ -1,4 +1,4 @@
-package com.dev.product_web.controller.product;
+package com.dev.product_web.controller.admin.product;
 
 
 import com.dev.product_web.dto.product.ProductResponse;

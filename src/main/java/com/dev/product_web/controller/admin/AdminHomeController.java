@@ -18,7 +18,7 @@ public class AdminHomeController {
         if(u == null) {
             return "redirect:/login";
         }
-//        redirectAttributes.addFlashAttribute("user", u);
+        model.addAttribute("currentUser_Id", u.getId());
         return "admin/index";
     }
 
