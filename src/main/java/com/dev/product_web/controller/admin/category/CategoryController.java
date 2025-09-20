@@ -19,8 +19,15 @@ public class CategoryController {
     private final CategoryService categoryService;
 
     @GetMapping({"", "/list"})
-    public List<CategoryResponse> getCategories() {
-        return categoryService.getAllCategories();
+    public List<CategoryResponse> getCategories(@RequestParam(required = false) String search) {
+        List<CategoryResponse> categories;
+        if (search != null && !search.isEmpty()) {
+            categories = categoryService.findByNameContainingIgnoreCase(search);
+        } else {
+            categories = categoryService.getAllCategories();
+        }
+        return categories;
+//        return categoryService.getAllCategories();
     }
 
     @PostMapping("/add")

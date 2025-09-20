@@ -1,26 +1,40 @@
 let allCategories = []; // lưu toàn bộ danh mục lấy từ server
 const PAGE_SIZE = 5;
 let currentPage = 1;
+let currentSearchKeyword = '';
 
 // Hàm tạo HTML danh sách danh mục
-function renderCategoryList(categories) {
+function renderCategoryList(categories, searchKeyword = '') {
     let html = `
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2>Quản lý danh mục</h2>
-            <button class="btn btn-success" id="openAddCategoryModalBtn">
-                <i class="bi bi-plus"></i> Thêm danh mục
-            </button>
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+            <h2 class="mb-0">Quản lý danh mục</h2>
+            <div class="d-flex gap-2">
+                <div class="input-group shadow-sm rounded">
+                    <span class="input-group-text bg-white border-end-0">
+                        <i class="bi bi-search"></i>
+                    </span>
+                    <input type="text" 
+                           id="categorySearchInput" 
+                           class="form-control border-start-0" 
+                           placeholder="Tìm kiếm theo tên danh mục" 
+                           value="${searchKeyword}">
+                </div>
+                <button class="btn btn-success" id="openAddCategoryModalBtn">
+                    <i class="bi bi-plus"></i> Thêm danh mục
+                </button>
+            </div>
         </div>
+
         <div class="card shadow-sm">
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table table-striped">
-                        <thead>
+                    <table class="table table-striped align-middle">
+                        <thead class="table-light">
                             <tr>
-                                <th>STT</th> <!-- Số thứ tự -->
-                                <th>Tên danh mục</th>
+                                <th style="width: 60px;">STT</th>
+                                <th style="width: 25%;">Tên danh mục</th>
                                 <th>Mô tả</th>
-                                <th>Thao tác</th>
+                                <th style="width: 150px;">Thao tác</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -29,14 +43,16 @@ function renderCategoryList(categories) {
     categories.forEach((category, index) => {
         html += `
             <tr data-id="${category.id}">
-                <td>${index + 1}</td> <!-- Hiển thị số thứ tự -->
+                <td>${index + 1}</td>
                 <td>${category.name}</td>
                 <td>${category.description || ''}</td>
                 <td>
-                    <button class="btn btn-sm btn-primary me-1 btn-edit-category" aria-label="Sửa danh mục ${category.name}">
+                    <button class="btn btn-sm btn-primary me-1 btn-edit-category" 
+                            aria-label="Sửa danh mục ${category.name}">
                         <i class="bi bi-pencil"></i>
                     </button>
-                    <button class="btn btn-sm btn-danger btn-delete-category" aria-label="Xóa danh mục ${category.name}">
+                    <button class="btn btn-sm btn-danger btn-delete-category" 
+                            aria-label="Xóa danh mục ${category.name}">
                         <i class="bi bi-trash"></i>
                     </button>
                 </td>
@@ -113,7 +129,7 @@ function attachCategoryEventListeners() {
     });
 }
 
-export function refreshCategoryList(page = 1, forceReload = false) {
+export function refreshCategoryList(page = 1, forceReload = false,searchKeyword = '') {
     currentPage = page;
 
     // Ẩn tất cả content sections
@@ -128,14 +144,16 @@ export function refreshCategoryList(page = 1, forceReload = false) {
             })
             .then(categories => {
                 allCategories = categories;
-                renderPage();
+                // renderPage();
+                renderPage(searchKeyword);
             })
             .catch(error => {
                 console.error('Lỗi khi tải danh mục:', error);
                 alert('Không tải được danh mục!');
             });
     } else {
-        renderPage();
+        renderPage(searchKeyword);
+        // renderPage();
     }
 
     function renderPage() {
@@ -216,8 +234,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-export function loadCategoryContent(event) {
+export function loadCategoryContent(event,searchKeyword = '') {
     if (event) event.preventDefault();
+    currentSearchKeyword = searchKeyword;
     // Ẩn tất cả content sections
     const sections = document.querySelectorAll('.content-section');
     sections.forEach(s => s.style.display = 'none');
@@ -231,7 +250,8 @@ export function loadCategoryContent(event) {
             .then(categories => {
                 allCategories = categories;
                 currentPage = 1;
-                renderCategoryPage(currentPage);
+                // renderCategoryPage(currentPage);
+                renderCategoryPage(currentPage, currentSearchKeyword);
             })
             .catch(error => {
                 console.error(error);
@@ -239,7 +259,8 @@ export function loadCategoryContent(event) {
             });
     } else {
         // Đã có dữ liệu, chỉ render lại trang hiện tại
-        renderCategoryPage(currentPage);
+        // renderCategoryPage(currentPage);
+        renderCategoryPage(currentPage, currentSearchKeyword);
     }
     // Cập nhật active nav-link
     const navLinks = document.querySelectorAll('.sidebar .nav-link');
@@ -249,18 +270,54 @@ export function loadCategoryContent(event) {
     }
 }
 
-function renderCategoryPage(page) {
+// function renderCategoryPage(page) {
+//     currentPage = page;
+//     const startIndex = (page - 1) * PAGE_SIZE;
+//     const endIndex = startIndex + PAGE_SIZE;
+//     const pageItems = allCategories.slice(startIndex, endIndex);
+//     const totalPages = Math.ceil(allCategories.length / PAGE_SIZE);
+//     const contentDiv = document.getElementById('category-content');
+//     contentDiv.innerHTML = renderCategoryList(pageItems) + renderPagination(totalPages, page);
+//     contentDiv.style.display = 'block';
+//     attachCategoryEventListeners();
+//     attachPaginationEventListeners();
+// }
+
+function renderCategoryPage(page, searchKeyword = '') {
     currentPage = page;
-    const startIndex = (page - 1) * PAGE_SIZE;
+
+    // Lọc danh mục theo từ khóa tìm kiếm
+    let filteredCategories = allCategories;
+    if (searchKeyword.trim() !== '') {
+        const keywordLower = searchKeyword.trim().toLowerCase();
+        filteredCategories = allCategories.filter(cat => cat.name.toLowerCase().includes(keywordLower));
+    }
+
+    const totalPages = Math.ceil(filteredCategories.length / PAGE_SIZE);
+    if (currentPage > totalPages) currentPage = totalPages > 0 ? totalPages : 1;
+
+    const startIndex = (currentPage - 1) * PAGE_SIZE;
     const endIndex = startIndex + PAGE_SIZE;
-    const pageItems = allCategories.slice(startIndex, endIndex);
-    const totalPages = Math.ceil(allCategories.length / PAGE_SIZE);
+    const pageItems = filteredCategories.slice(startIndex, endIndex);
+
     const contentDiv = document.getElementById('category-content');
-    contentDiv.innerHTML = renderCategoryList(pageItems) + renderPagination(totalPages, page);
+    contentDiv.innerHTML = renderCategoryList(pageItems, searchKeyword) + renderPagination(totalPages, currentPage);
     contentDiv.style.display = 'block';
+
     attachCategoryEventListeners();
     attachPaginationEventListeners();
+
+    // Gán sự kiện input cho ô tìm kiếm
+    const searchInput = document.getElementById('categorySearchInput');
+    if (searchInput) {
+        searchInput.oninput = null;
+        searchInput.addEventListener('input', (e) => {
+            currentPage = 1;
+            loadCategoryContent(null, e.target.value);
+        });
+    }
 }
+
 
 // xử lý sự kiện nhấn nút edit
 document.addEventListener('DOMContentLoaded', () => {
@@ -370,6 +427,92 @@ function attachPaginationEventListeners() {
         });
     });
 }
+
+// tìm kiếm
+// function renderPage(searchKeyword = '') {
+//     const totalPages = Math.ceil(allCategories.length / PAGE_SIZE);
+//     if (currentPage > totalPages) currentPage = totalPages > 0 ? totalPages : 1;
+//
+//     // Nếu có từ khóa tìm kiếm, lọc danh sách
+//     let filteredCategories = allCategories;
+//     if (searchKeyword.trim() !== '') {
+//         const keywordLower = searchKeyword.trim().toLowerCase();
+//         filteredCategories = allCategories.filter(cat => cat.name.toLowerCase().includes(keywordLower));
+//     }
+//
+//     const totalFilteredPages = Math.ceil(filteredCategories.length / PAGE_SIZE);
+//     if (currentPage > totalFilteredPages) currentPage = totalFilteredPages > 0 ? totalFilteredPages : 1;
+//
+//     const startIndex = (currentPage - 1) * PAGE_SIZE;
+//     const endIndex = startIndex + PAGE_SIZE;
+//     const pageItems = filteredCategories.slice(startIndex, endIndex);
+//
+//     const contentDiv = document.getElementById('category-content');
+//     contentDiv.innerHTML = renderCategoryList(pageItems, searchKeyword) + renderPagination(totalFilteredPages, currentPage);
+//     contentDiv.style.display = 'block';
+//
+//     attachCategoryEventListeners();
+//     attachPaginationEventListeners();
+//
+//     // Gắn sự kiện cho ô tìm kiếm
+//     const searchInput = document.getElementById('categorySearchInput');
+//     if (searchInput) {
+//         searchInput.addEventListener('input', (e) => {
+//             currentPage = 1; // reset về trang 1 khi tìm kiếm
+//             renderPage(e.target.value);
+//         });
+//     }
+//
+//     // Cập nhật active nav-link cho menu danh mục
+//     const navLinks = document.querySelectorAll('.sidebar .nav-link');
+//     navLinks.forEach(link => link.classList.remove('active'));
+//     const categoryNavLink = document.querySelector('.sidebar .nav-link[onclick*="loadCategoryContent"]');
+//     if (categoryNavLink) categoryNavLink.classList.add('active');
+// }
+
+
+function renderPage(searchKeyword = '') {
+    // Lọc danh sách theo từ khóa tìm kiếm
+    let filteredCategories = allCategories;
+    if (searchKeyword.trim() !== '') {
+        const keywordLower = searchKeyword.trim().toLowerCase();
+        filteredCategories = allCategories.filter(cat => cat.name.toLowerCase().includes(keywordLower));
+    }
+
+    const totalFilteredPages = Math.ceil(filteredCategories.length / PAGE_SIZE);
+    if (currentPage > totalFilteredPages) currentPage = totalFilteredPages > 0 ? totalFilteredPages : 1;
+
+    const startIndex = (currentPage - 1) * PAGE_SIZE;
+    const endIndex = startIndex + PAGE_SIZE;
+    const pageItems = filteredCategories.slice(startIndex, endIndex);
+
+    const contentDiv = document.getElementById('category-content');
+    contentDiv.innerHTML = renderCategoryList(pageItems, searchKeyword) + renderPagination(totalFilteredPages, currentPage);
+    contentDiv.style.display = 'block';
+
+    attachCategoryEventListeners();
+    attachPaginationEventListeners();
+
+    // Gán sự kiện input cho ô tìm kiếm **sau khi render xong**
+    const searchInput = document.getElementById('categorySearchInput');
+    if (searchInput) {
+        // Xóa sự kiện cũ (nếu có) để tránh gán nhiều lần
+        searchInput.oninput = null;
+
+        searchInput.addEventListener('input', (e) => {
+            console.log('Input search:', e.target.value);
+            currentPage = 1; // reset về trang 1 khi tìm kiếm
+            renderPage(e.target.value);
+        });
+    }
+
+    // Cập nhật active nav-link cho menu danh mục
+    const navLinks = document.querySelectorAll('.sidebar .nav-link');
+    navLinks.forEach(link => link.classList.remove('active'));
+    const categoryNavLink = document.querySelector('.sidebar .nav-link[onclick*="loadCategoryContent"]');
+    if (categoryNavLink) categoryNavLink.classList.add('active');
+}
+
 
 
 

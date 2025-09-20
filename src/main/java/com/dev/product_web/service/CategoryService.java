@@ -17,4 +17,6 @@ public interface CategoryService {
 
     void deleteCategory(Integer id);
 
+    List<CategoryResponse> findByNameContainingIgnoreCase(String name);
+
 }

@@ -59,4 +59,12 @@ public class CategoryServiceImpl implements CategoryService {
         }
         categoryRepository.deleteById(id);
     }
+
+    @Override
+    public List<CategoryResponse> findByNameContainingIgnoreCase(String name) {
+        return categoryRepository.findByNameContainingIgnoreCase(name)
+                .stream()
+                .map(c -> modelMapper.map(c, CategoryResponse.class))
+                .collect(Collectors.toList());
+    }
 }
