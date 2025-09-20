@@ -1,3 +1,7 @@
+let allCategories = []; // lưu toàn bộ danh mục lấy từ server
+const PAGE_SIZE = 5;
+let currentPage = 1;
+
 // Hàm tạo HTML danh sách danh mục
 function renderCategoryList(categories) {
     let html = `
@@ -91,7 +95,15 @@ function attachCategoryEventListeners() {
                     })
                     .then(data => {
                         alert('Xóa danh mục thành công!');
-                        refreshCategoryList();
+                        // Tính tổng phần tử sau khi xóa (giả sử server đã xóa thành công)
+                        const totalItems = allCategories.length - 1;
+                        const totalPages = Math.ceil(totalItems / PAGE_SIZE);
+                        // Nếu trang hiện tại vượt quá tổng trang mới, giảm trang hiện tại
+                        let newPage = currentPage;
+                        if (currentPage > totalPages) {
+                            newPage = totalPages > 0 ? totalPages : 1;
+                        }
+                        refreshCategoryList(newPage, true);
                     })
                     .catch(error => {
                         alert(error.message);
@@ -101,35 +113,55 @@ function attachCategoryEventListeners() {
     });
 }
 
-// Hàm tải và hiển thị danh sách danh mục
-export function refreshCategoryList() {
+export function refreshCategoryList(page = 1, forceReload = false) {
+    currentPage = page;
+
     // Ẩn tất cả content sections
     const sections = document.querySelectorAll('.content-section');
     sections.forEach(s => s.style.display = 'none');
 
-    fetch('/admin/categories/list')
-        .then(response => {
-            if (!response.ok) throw new Error('Lỗi khi tải dữ liệu');
-            return response.json();
-        })
-        .then(categories => {
-            const contentDiv = document.getElementById('category-content');
-            contentDiv.innerHTML = renderCategoryList(categories);
-            contentDiv.style.display = 'block';
+    if (forceReload || allCategories.length === 0) {
+        fetch('/admin/categories/list')
+            .then(response => {
+                if (!response.ok) throw new Error('Lỗi khi tải dữ liệu');
+                return response.json();
+            })
+            .then(categories => {
+                allCategories = categories;
+                renderPage();
+            })
+            .catch(error => {
+                console.error('Lỗi khi tải danh mục:', error);
+                alert('Không tải được danh mục!');
+            });
+    } else {
+        renderPage();
+    }
 
-            attachCategoryEventListeners();
+    function renderPage() {
+        const totalPages = Math.ceil(allCategories.length / PAGE_SIZE);
+        // Nếu page vượt quá tổng trang, set lại page = totalPages
+        if (currentPage > totalPages) currentPage = totalPages > 0 ? totalPages : 1;
 
-            // Cập nhật active nav-link cho menu danh mục
-            const navLinks = document.querySelectorAll('.sidebar .nav-link');
-            navLinks.forEach(link => link.classList.remove('active'));
-            const categoryNavLink = document.querySelector('.sidebar .nav-link[onclick*="loadCategoryContent"]');
-            if (categoryNavLink) categoryNavLink.classList.add('active');
-        })
-        .catch(error => {
-            console.error('Lỗi khi tải danh mục:', error);
-            alert('Không tải được danh mục!');
-        });
+        const startIndex = (currentPage - 1) * PAGE_SIZE;
+        const endIndex = startIndex + PAGE_SIZE;
+        const pageItems = allCategories.slice(startIndex, endIndex);
+
+        const contentDiv = document.getElementById('category-content');
+        contentDiv.innerHTML = renderCategoryList(pageItems) + renderPagination(totalPages, currentPage);
+        contentDiv.style.display = 'block';
+
+        attachCategoryEventListeners();
+        attachPaginationEventListeners();
+
+        // Cập nhật active nav-link cho menu danh mục
+        const navLinks = document.querySelectorAll('.sidebar .nav-link');
+        navLinks.forEach(link => link.classList.remove('active'));
+        const categoryNavLink = document.querySelector('.sidebar .nav-link[onclick*="loadCategoryContent"]');
+        if (categoryNavLink) categoryNavLink.classList.add('active');
+    }
 }
+
 
 // Xử lý submit form thêm danh mục
 document.addEventListener('DOMContentLoaded', () => {
@@ -168,12 +200,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     const addCategoryModalEl = document.getElementById('addCategoryModal');
                     const modal = bootstrap.Modal.getInstance(addCategoryModalEl);
                     if (modal) modal.hide();
-
                     form.reset();
                     form.classList.remove('was-validated');
+                    // Tính trang cuối cùng sau khi thêm
+                    const totalItems = allCategories.length + 1; // +1 vì đã thêm mới
+                    const lastPage = Math.ceil(totalItems / PAGE_SIZE);
+                    // Load lại danh sách và chuyển sang trang cuối cùng
+                    refreshCategoryList(lastPage, true);
 
-                    // Load lại danh sách
-                    refreshCategoryList();
                 })
                 .catch(error => {
                     alert(error.message);
@@ -182,33 +216,50 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// Hàm load nội dung danh mục, có thể dùng làm hàm gọi khi click menu
 export function loadCategoryContent(event) {
     if (event) event.preventDefault();
     // Ẩn tất cả content sections
     const sections = document.querySelectorAll('.content-section');
     sections.forEach(s => s.style.display = 'none');
-    fetch('/admin/categories/list')
-        .then(response => {
-            if (!response.ok) throw new Error('Lỗi khi tải dữ liệu');
-            return response.json();
-        })
-        .then(categories => {
-            const contentDiv = document.getElementById('category-content');
-            contentDiv.innerHTML = renderCategoryList(categories);
-            contentDiv.style.display = 'block';
-            attachCategoryEventListeners();
-            // Cập nhật active nav-link
-            const navLinks = document.querySelectorAll('.sidebar .nav-link');
-            navLinks.forEach(link => link.classList.remove('active'));
-            if (event && event.target) {
-                event.target.classList.add('active');
-            }
-        })
-        .catch(error => {
-            console.error(error);
-            alert('Không tải được danh mục!');
-        });
+    if (allCategories.length === 0) {
+        // Lần đầu tải dữ liệu
+        fetch('/admin/categories/list')
+            .then(response => {
+                if (!response.ok) throw new Error('Lỗi khi tải dữ liệu');
+                return response.json();
+            })
+            .then(categories => {
+                allCategories = categories;
+                currentPage = 1;
+                renderCategoryPage(currentPage);
+            })
+            .catch(error => {
+                console.error(error);
+                alert('Không tải được danh mục!');
+            });
+    } else {
+        // Đã có dữ liệu, chỉ render lại trang hiện tại
+        renderCategoryPage(currentPage);
+    }
+    // Cập nhật active nav-link
+    const navLinks = document.querySelectorAll('.sidebar .nav-link');
+    navLinks.forEach(link => link.classList.remove('active'));
+    if (event && event.target) {
+        event.target.classList.add('active');
+    }
+}
+
+function renderCategoryPage(page) {
+    currentPage = page;
+    const startIndex = (page - 1) * PAGE_SIZE;
+    const endIndex = startIndex + PAGE_SIZE;
+    const pageItems = allCategories.slice(startIndex, endIndex);
+    const totalPages = Math.ceil(allCategories.length / PAGE_SIZE);
+    const contentDiv = document.getElementById('category-content');
+    contentDiv.innerHTML = renderCategoryList(pageItems) + renderPagination(totalPages, page);
+    contentDiv.style.display = 'block';
+    attachCategoryEventListeners();
+    attachPaginationEventListeners();
 }
 
 // xử lý sự kiện nhấn nút edit
@@ -264,6 +315,64 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+function renderPagination(totalPages, currentPage) {
+    if (totalPages <= 1) return '';
+
+    let html = `<nav aria-label="Page navigation"><ul class="pagination justify-content-center mt-3">`;
+
+    html += `
+        <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+            <a class="page-link" href="#" data-page="${currentPage - 1}" aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+            </a>
+        </li>
+    `;
+
+    const maxPagesToShow = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxPagesToShow / 2));
+    let endPage = startPage + maxPagesToShow - 1;
+    if (endPage > totalPages) {
+        endPage = totalPages;
+        startPage = Math.max(1, endPage - maxPagesToShow + 1);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+        html += `
+            <li class="page-item ${i === currentPage ? 'active' : ''}">
+                <a class="page-link" href="#" data-page="${i}">${i}</a>
+            </li>
+        `;
+    }
+
+    html += `
+        <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+            <a class="page-link" href="#" data-page="${currentPage + 1}" aria-label="Next">
+                <span aria-hidden="true">&raquo;</span>
+            </a>
+        </li>
+    `;
+
+    html += `</ul></nav>`;
+
+    return html;
+}
+
+function attachPaginationEventListeners() {
+    const paginationLinks = document.querySelectorAll('#category-content .pagination a.page-link');
+    paginationLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const page = parseInt(link.getAttribute('data-page'));
+            if (!isNaN(page) && page >= 1) {
+                renderCategoryPage(page);
+            }
+        });
+    });
+}
+
+
+
 
 
 
